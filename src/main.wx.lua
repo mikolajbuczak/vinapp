@@ -63,12 +63,33 @@ dialog:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     for index, path in pairs(paths) do 
       table.insert(playlist, path)
-      print(playlist[index])
     end
     
     local songs = filePicker:GetFilenames()
     
     listBox:InsertItems(songs, listBox:GetCount())
+  end
+)
+
+dialog:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local selectedIndex = listBox:GetSelection()
+    if selectedIndex == wx.wxNOT_FOUND then
+      return
+    end
+    listBox:Delete(selectedIndex)
+    
+    for index, path in pairs(playlist) do 
+      print(index)
+      print(path)
+    end
+    
+    table.remove(playlist, selectedIndex + 1);
+    
+    for index, path in pairs(playlist) do 
+      print(index)
+      print(path)
+    end
   end
 )
 
