@@ -1,6 +1,8 @@
 package.cpath = package.cpath..";./?.dll;./?.so;../lib/?.so;../lib/vc_dll/?.dll;../lib/bcc_dll/?.dll;../lib/mingw_dll/?.dll;"
 require("wx")
 
+isLoaded = false
+
 ID_TIME_LABEL                   = 1
 ID_TITLE_LABEL                  = 2
 ID_DURATION_BAR                 = 3
@@ -101,18 +103,37 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     if selectedIndex == -1 then return end
     
+    isLoaded = false
+    
     local file = listBox:GetString(selectedIndex)
     
     if not media:Load(playlist[selectedIndex + 1]) then
         wx.wxMessageBox(string.format("Cannot load  %s.", file), "Error", wx.wxICON_ERROR + wx.wxOK)
         return
     end
+    
+    isLoaded = true;
   end
 )
 
 -- Plays loaded song
 frame:Connect(ID_PLAY_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
+    if not isLoaded then
+        local selectedIndex = listBox:GetSelection()
+    
+        if selectedIndex == -1 then return end
+        
+        local file = listBox:GetString(selectedIndex)
+        
+        if not media:Load(playlist[selectedIndex + 1]) then
+            wx.wxMessageBox(string.format("Cannot load  %s.", file), "Error", wx.wxICON_ERROR + wx.wxOK)
+            return
+        end
+        
+        isLoaded = true;
+    end
+  
     local canPlay = media:Play()
     
     if not canPlay then return end
