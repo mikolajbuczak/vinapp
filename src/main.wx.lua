@@ -128,6 +128,15 @@ frame:Connect(ID_PAUSE_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   end
 )
 
+-- Stop played song
+frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local canStop = media:Stop()
+    
+    if not canStop then return end
+  end
+)
+
 -- Move selected song up
 frame:Connect(ID_UP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
