@@ -44,6 +44,10 @@ local muteButton = wx.wxButton(panel, ID_VOLUME_BUTTON, "M", wx.wxPoint(355, 125
 
 local midLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 165), wx.wxSize(400, 1))
 
+local playlist = {}
+
+local listBox = wx.wxListBox(panel, wx.wxID_ANY, wx.wxPoint(10, 175), wx.wxSize(375, 235), playlist, wx.wxLB_SINGLE)
+
 local bottomLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 419), wx.wxSize(400, 1))
 
 local addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "ADD", wx.wxPoint(10, 430), wx.wxSize(40, 30))
