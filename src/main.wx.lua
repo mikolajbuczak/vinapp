@@ -85,7 +85,7 @@ frame:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local selectedIndex = listBox:GetSelection()
     
-    if selectedIndex == wx.wxNOT_FOUND then return end
+    if selectedIndex == -1 then return end
     
     listBox:Delete(selectedIndex)
   
@@ -99,7 +99,7 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local selectedIndex = listBox:GetSelection()
     
-    if selectedIndex == wx.wxNOT_FOUND then return end
+    if selectedIndex == -1 then return end
     
     local file = listBox:GetString(selectedIndex)
     
@@ -115,10 +115,16 @@ frame:Connect(ID_PLAY_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local canPlay = media:Play()
     
-    if not canPlay then
-        wx.wxMessageBox(string.format("Cannot play"), "Error", wx.wxICON_ERROR + wx.wxOK)
-        return
-    end
+    if not canPlay then return end
+  end
+)
+
+-- Pauses played song
+frame:Connect(ID_PAUSE_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local canPause = media:Pause()
+    
+    if not canPause then return end
   end
 )
 
@@ -127,7 +133,7 @@ frame:Connect(ID_UP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local selectedIndex = listBox:GetSelection()
     
-    if selectedIndex == wx.wxNOT_FOUND then return end
+    if selectedIndex == -1 then return end
     
     if selectedIndex == 0 then return end
     
@@ -151,7 +157,7 @@ frame:Connect(ID_DOWN_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local selectedIndex = listBox:GetSelection()
     
-    if selectedIndex == wx.wxNOT_FOUND then return end
+    if selectedIndex == -1 then return end
     
     local lastIndex = listBox:GetCount()
     
