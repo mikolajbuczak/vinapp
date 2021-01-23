@@ -17,8 +17,10 @@ ID_VOLUME_BUTTON                = 13
 ID_ADD_TO_PLAYLIST_BUTTON       = 14
 ID_REMOVE_FROM_PLAYLIST_BUTTON  = 15
 ID_PLAY_SELECTED_TRACK_BUTTON   = 16
+ID_UP_BUTTON                    = 17
+ID_DOWN_BUTTON                  = 18
 
-ID__MAX                         = 17
+ID__MAX                         = 19
 
 --wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 dialog = wx.wxDialog(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSize(400, 500))
@@ -54,6 +56,10 @@ local addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "ADD",
 local removeFromPlaylistButton = wx.wxButton(panel, ID_REMOVE_FROM_PLAYLIST_BUTTON, "REM", wx.wxPoint(55, 430), wx.wxSize(40, 30))
 local playSelectedButton = wx.wxButton(panel, ID_PLAY_SELECTED_TRACK_BUTTON, "SELECT", wx.wxPoint(100, 430), wx.wxSize(60, 30))
 
+local upButton = wx.wxButton(panel, ID_UP_BUTTON, "↑", wx.wxPoint(320, 430), wx.wxSize(30, 30))
+local downButton = wx.wxButton(panel, ID_DOWN_BUTTON, "↓", wx.wxPoint(355, 430), wx.wxSize(30, 30))
+
+-- Add songs to the playlist
 dialog:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local filePicker = wx.wxFileDialog(dialog, wx.wxFileSelectorPromptStr, "%USERPROFILE%\\Desktop", "", "*.mp3", wx.wxFD_MULTIPLE)
@@ -71,25 +77,67 @@ dialog:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   end
 )
 
+-- Remove selected song from the playlist
 dialog:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     local selectedIndex = listBox:GetSelection()
-    if selectedIndex == wx.wxNOT_FOUND then
-      return
-    end
+    
+    if selectedIndex == wx.wxNOT_FOUND then return end
+    
     listBox:Delete(selectedIndex)
-    
-    for index, path in pairs(playlist) do 
-      print(index)
-      print(path)
-    end
-    
+  
     table.remove(playlist, selectedIndex + 1);
     
-    for index, path in pairs(playlist) do 
-      print(index)
-      print(path)
-    end
+  end
+)
+
+-- Move selected song up
+dialog:Connect(ID_UP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local selectedIndex = listBox:GetSelection()
+    
+    if selectedIndex == wx.wxNOT_FOUND then return end
+    
+    if selectedIndex == 0 then return end
+    
+    local filename = listBox:GetString(selectedIndex)
+    local filepath = playlist[selectedIndex + 1]
+    
+    listBox:Delete(selectedIndex)
+    table.remove(playlist, selectedIndex + 1)
+    
+    local newItem = { filename }
+    listBox:InsertItems(newItem, selectedIndex - 1)
+    listBox:SetSelection(selectedIndex - 1)
+    
+    table.insert(playlist, selectedIndex, filepath)
+    
+  end
+)
+
+-- Move selected song down
+dialog:Connect(ID_DOWN_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local selectedIndex = listBox:GetSelection()
+    
+    if selectedIndex == wx.wxNOT_FOUND then return end
+    
+    local lastIndex = listBox:GetCount()
+    
+    if selectedIndex == lastIndex - 1  then return end
+    
+    local filename = listBox:GetString(selectedIndex)
+    local filepath = playlist[selectedIndex + 1]
+    
+    listBox:Delete(selectedIndex)
+    table.remove(playlist, selectedIndex + 1)
+    
+    local newItem = { filename }
+    listBox:InsertItems(newItem, selectedIndex + 1 )
+    listBox:SetSelection(selectedIndex + 1)
+    
+    table.insert(playlist, selectedIndex + 2, filepath)
+    
   end
 )
 
