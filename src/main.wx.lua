@@ -54,9 +54,21 @@ local addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "ADD",
 local removeFromPlaylistButton = wx.wxButton(panel, ID_REMOVE_FROM_PLAYLIST_BUTTON, "REM", wx.wxPoint(55, 430), wx.wxSize(40, 30))
 local playSelectedButton = wx.wxButton(panel, ID_PLAY_SELECTED_TRACK_BUTTON, "SELECT", wx.wxPoint(100, 430), wx.wxSize(60, 30))
 
-dialog:Connect(wx.wxID_ANY, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+dialog:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
-    -- button logic
+    local filePicker = wx.wxFileDialog(dialog, wx.wxFileSelectorPromptStr, "%USERPROFILE%\\Desktop", "", "*.mp3", wx.wxFD_MULTIPLE)
+    filePicker:ShowModal()
+    
+    local paths = filePicker:GetPaths()
+    
+    for index, path in pairs(paths) do 
+      table.insert(playlist, path)
+      print(playlist[index])
+    end
+    
+    local songs = filePicker:GetFilenames()
+    
+    listBox:InsertItems(songs, listBox:GetCount())
   end
 )
 
