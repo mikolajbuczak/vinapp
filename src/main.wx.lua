@@ -25,7 +25,6 @@ ID_MEDIA                        = 19
 
 ID__MAX                         = 20
 
---wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSize(400, 500), wx.wxDEFAULT_FRAME_STYLE - wx.wxRESIZE_BORDER - wx.wxMAXIMIZE_BOX)
 panel = wx.wxPanel(frame, wx.wxID_ANY)
 local time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00", wx.wxPoint(10, 10), wx.wxSize(30, 30))
@@ -67,18 +66,19 @@ local media = wx.wxMediaCtrl(panel, ID_MEDIA)
 -- Add songs to the playlist
 frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
-    local filePicker = wx.wxFileDialog(frame, wx.wxFileSelectorPromptStr, "%USERPROFILE%\\Desktop", "", "*.mp3", wx.wxFD_MULTIPLE)
-    filePicker:ShowModal()
-    
-    local paths = filePicker:GetPaths()
-    
-    for index, path in pairs(paths) do 
-      table.insert(playlist, path)
+    local filePicker = wx.wxFileDialog(frame, wx.wxFileSelectorPromptStr, wx.wxGetCwd(), "", "*.mp3", wx.wxFD_OPEN + wx.wxFD_MULTIPLE + wx.wxFD_FILE_MUST_EXIST + wx.wxFD_CHANGE_DIR)
+    if filePicker:ShowModal() == wx.wxID_OK then
+        local paths = filePicker:GetPaths()
+        
+        for index, path in pairs(paths) do 
+          table.insert(playlist, path)
+        end
+        
+        local songs = filePicker:GetFilenames()
+        
+        listBox:InsertItems(songs, listBox:GetCount())
     end
-    
-    local songs = filePicker:GetFilenames()
-    
-    listBox:InsertItems(songs, listBox:GetCount())
+    filePicker:Destroy()
   end
 )
 
