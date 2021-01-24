@@ -28,6 +28,12 @@ ID_MEDIA                        = 19
 
 ID__MAX                         = 20
 
+function msToMMSS(ms)
+    local m = math.floor(ms/(60*1000))
+    local s = math.floor((ms - m*60*1000)/1000)
+    return string.format("%02d:%02d", m, s)
+end
+
 function UpdateButtons()
     local playEnabled  = false
     local pauseEnable = false
@@ -62,7 +68,7 @@ panel = wx.wxPanel(frame, wx.wxID_ANY)
 -- Song info GUI
 time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00", wx.wxPoint(10, 10), wx.wxSize(30, 30))
 title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(50, 10), wx.wxSize(340, 30))
-duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, 100, wx.wxPoint(0, 35), wx.wxSize(390, 30))
+duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, sliderMax, wx.wxPoint(0, 35), wx.wxSize(390, 30))
 
 topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
 
@@ -100,6 +106,27 @@ downButton = wx.wxButton(panel, ID_DOWN_BUTTON, "↓", wx.wxPoint(355, 430), wx.
 media = wx.wxMediaCtrl(panel, ID_MEDIA)
 
 UpdateButtons()
+
+timer = wx.wxTimer(panel)
+panel:Connect(wx.wxEVT_TIMER,
+    function (event)
+        local len = 1
+        local pos = 0
+        local str = "00:00"
+
+        if not isLoaded then return end
+        
+        len = media:Length()
+        pos = media:Tell()
+        str = string.format("%s", msToMMSS(pos))
+        duration:SetValue(sliderMax * pos / len)
+        time:SetLabel(str)
+        
+        print(str)
+    end
+)
+
+timer:Start(300)
 
 -- Add songs to the playlist
 frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
@@ -284,6 +311,11 @@ frame:Connect(wx.wxEVT_CLOSE_WINDOW,
     function (event)
         frame:Destroy()
         event:Skip()
+        if timer then
+            timer:Stop()
+            timer:delete()
+            timer = nil
+        end
     end)
 
 frame:Centre()
