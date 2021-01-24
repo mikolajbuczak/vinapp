@@ -228,9 +228,12 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
     function (event)
         UpdateButtons()
+        -- Replay song if repeat mode on
         if isLoaded and repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then
             media:Play()
+        -- Check if the song is over with none mode on
         elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then 
+            -- Check if the next song is a song at next index and load that song
             if listBox:GetCount() > currentSongIndex + 1 then 
                 isLoaded = false
     
@@ -246,6 +249,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 stopPressed = true
+            -- Next song is a song with index 0, load it
             else
                 isLoaded = false
     
@@ -261,8 +265,8 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 stopPressed = true
-
             end
+        -- Play songs from playlist
         elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and stopPressed then 
             media:Play()
             stopPressed = false
