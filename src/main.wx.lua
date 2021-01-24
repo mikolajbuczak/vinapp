@@ -5,28 +5,38 @@ playlist = {}
 isLoaded = false
 sliderMax = 10000
 prevVolume = -1
+repeatOn = false
+stopPressed = false
 
-ID_TIME_LABEL                   = 1
-ID_TITLE_LABEL                  = 2
-ID_DURATION_BAR                 = 3
-ID_RANDOM_BUTTON                = 4
-ID_REPEAT_BUTTON                = 5
-ID_SELECT_FILE_BUTTON           = 6
-ID_BACKWARDS_BUTTON             = 7
-ID_PLAY_BUTTON                  = 8
-ID_PAUSE_BUTTON                 = 9
-ID_STOP_BUTTON                  = 10
-ID_FORWARD_BUTTON               = 11
-ID_VOLUME_BAR                   = 12
-ID_VOLUME_BUTTON                = 13
-ID_ADD_TO_PLAYLIST_BUTTON       = 14
-ID_REMOVE_FROM_PLAYLIST_BUTTON  = 15
-ID_PLAY_SELECTED_TRACK_BUTTON   = 16
-ID_UP_BUTTON                    = 17
-ID_DOWN_BUTTON                  = 18
-ID_MEDIA                        = 19
+local IDCounter = nil
+local function NewID()
+    if not IDCounter then IDCounter = wx.wxID_HIGHEST end
+    IDCounter = IDCounter + 1
+    return IDCounter
+end
 
-ID__MAX                         = 20
+ID_TIME_LABEL                   = NewID()
+ID_TITLE_LABEL                  = NewID()
+ID_DURATION_BAR                 = NewID()
+ID_MODE_LABEL                   = NewID()
+ID_RANDOM_BUTTON                = NewID()
+ID_REPEAT_BUTTON                = NewID()
+ID_SELECT_FILE_BUTTON           = NewID()
+ID_BACKWARDS_BUTTON             = NewID()
+ID_PLAY_BUTTON                  = NewID()
+ID_PAUSE_BUTTON                 = NewID()
+ID_STOP_BUTTON                  = NewID()
+ID_FORWARD_BUTTON               = NewID()
+ID_VOLUME_BAR                   = NewID()
+ID_VOLUME_BUTTON                = NewID()
+ID_ADD_TO_PLAYLIST_BUTTON       = NewID()
+ID_REMOVE_FROM_PLAYLIST_BUTTON  = NewID()
+ID_PLAY_SELECTED_TRACK_BUTTON   = NewID()
+ID_UP_BUTTON                    = NewID()
+ID_DOWN_BUTTON                  = NewID()
+ID_MEDIA                        = NewID()
+
+ID__MAX                         = NewID()
 
 function msToMMSS(ms)
     local m = math.floor(ms/(60*1000))
@@ -71,6 +81,8 @@ title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(80, 10), wx.wx
 duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, sliderMax, wx.wxPoint(0, 35), wx.wxSize(390, 30))
     
 topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
+
+mode = wx.wxStaticText(panel, ID_TIME_LABEL, "Mode: None", wx.wxPoint(10, 80), wx.wxSize(80, 30))
 
 -- Buttons BUI
 randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(210, 80), wx.wxSize(55, 30))
@@ -143,6 +155,18 @@ panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_CHANGED,
     end
 )
 
+-- Turn on/off repeat mode
+frame:Connect(ID_REPEAT_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    repeatOn = not repeatOn
+    if repeatOn then
+        mode:SetLabel("Mode: Repeat")
+    else
+        mode:SetLabel("Mode: None")
+    end
+  end
+)
+
 -- Add songs to the playlist
 frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
@@ -194,14 +218,17 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     isLoaded = true
     title:SetLabel(file)
-    UpdateButtons()
     media:SetVolume(volumeBar:GetValue() / sliderMax)
+    stopPressed = true
   end
 )
 
 media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
     function (event)
         UpdateButtons()
+        if isLoaded and repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then
+            media:Play()
+        end
     end
 )
 
@@ -226,6 +253,8 @@ frame:Connect(ID_PLAY_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     local canPlay = media:Play()
     
     if not canPlay then return end
+    
+    stopPressed = false
   end
 )
 
@@ -244,6 +273,8 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     local canStop = media:Stop()
     
     if not canStop then return end
+    
+    stopPressed = true
   end
 )
 
