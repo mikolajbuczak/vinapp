@@ -1,6 +1,7 @@
 package.cpath = package.cpath..";./?.dll;./?.so;../lib/?.so;../lib/vc_dll/?.dll;../lib/bcc_dll/?.dll;../lib/mingw_dll/?.dll;"
 require("wx")
 
+playlist = {}
 isLoaded = false
 
 ID_TIME_LABEL                   = 1
@@ -25,43 +26,78 @@ ID_MEDIA                        = 19
 
 ID__MAX                         = 20
 
+function UpdateButtons()
+    local playEnabled  = false
+    local pauseEnable = false
+    local stopEnabled  = false
+
+    if isLoaded then
+        local state = media:GetState()
+
+        if state == wx.wxMEDIASTATE_PLAYING then
+            playEnabled  = false
+            pauseEnable = true
+            stopEnabled  = true
+        elseif state == wx.wxMEDIASTATE_PAUSED then
+            playEnabled  = true
+            pauseEnable = false
+            stopEnabled  = true
+        elseif state == wx.wxMEDIASTATE_STOPPED then
+            playEnabled  = true
+            pauseEnable = false
+            stopEnabled  = false
+        end
+    end
+
+    playButton:Enable(playEnabled)
+    pauseButton:Enable(pauseEnable)
+    stopButton:Enable(stopEnabled)
+end
+
 frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSize(400, 500), wx.wxDEFAULT_FRAME_STYLE - wx.wxRESIZE_BORDER - wx.wxMAXIMIZE_BOX)
 panel = wx.wxPanel(frame, wx.wxID_ANY)
-local time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00", wx.wxPoint(10, 10), wx.wxSize(30, 30))
-local title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(50, 10), wx.wxSize(340, 30))
-local duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, 100, wx.wxPoint(0, 35), wx.wxSize(390, 30))
 
-local topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
+-- Song info GUI
+time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00", wx.wxPoint(10, 10), wx.wxSize(30, 30))
+title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(50, 10), wx.wxSize(340, 30))
+duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, 100, wx.wxPoint(0, 35), wx.wxSize(390, 30))
 
-local randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(210, 80), wx.wxSize(55, 30))
-local repeatButton = wx.wxButton(panel, ID_REPEAT_BUTTON, "Repeat", wx.wxPoint(270, 80), wx.wxSize(55, 30))
-local selectFileButton = wx.wxButton(panel, ID_SELECT_FILE_BUTTON, "Select", wx.wxPoint(330, 80), wx.wxSize(55, 30))
+topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
 
-local backwardsButton = wx.wxButton(panel, ID_BACKWARDS_BUTTON, "Back", wx.wxPoint(10, 125), wx.wxSize(40, 30))
-local playButton = wx.wxButton(panel, ID_PLAY_BUTTON, "Play", wx.wxPoint(55, 125), wx.wxSize(40, 30))
-local pauseButton = wx.wxButton(panel, ID_PAUSE_BUTTON, "Pause", wx.wxPoint(100, 125), wx.wxSize(40, 30))
-local stopButton = wx.wxButton(panel, ID_STOP_BUTTON, "Stop", wx.wxPoint(145, 125), wx.wxSize(40, 30))
-local forwardButton = wx.wxButton(panel, ID_FORWARD_BUTTON, "Next", wx.wxPoint(190, 125), wx.wxSize(40, 30))
+-- Buttons BUI
+randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(210, 80), wx.wxSize(55, 30))
+repeatButton = wx.wxButton(panel, ID_REPEAT_BUTTON, "Repeat", wx.wxPoint(270, 80), wx.wxSize(55, 30))
+selectFileButton = wx.wxButton(panel, ID_SELECT_FILE_BUTTON, "Select", wx.wxPoint(330, 80), wx.wxSize(55, 30))
 
-local volumeBar = wx.wxSlider(panel, ID_VOLUME_BAR, 0, 0, 100, wx.wxPoint(250, 130), wx.wxSize(105, 30))
-local muteButton = wx.wxButton(panel, ID_VOLUME_BUTTON, "M", wx.wxPoint(355, 125), wx.wxSize(30, 30))
+backwardsButton = wx.wxButton(panel, ID_BACKWARDS_BUTTON, "Back", wx.wxPoint(10, 125), wx.wxSize(40, 30))
+playButton = wx.wxButton(panel, ID_PLAY_BUTTON, "Play", wx.wxPoint(55, 125), wx.wxSize(40, 30))
+pauseButton = wx.wxButton(panel, ID_PAUSE_BUTTON, "Pause", wx.wxPoint(100, 125), wx.wxSize(40, 30))
+stopButton = wx.wxButton(panel, ID_STOP_BUTTON, "Stop", wx.wxPoint(145, 125), wx.wxSize(40, 30))
+forwardButton = wx.wxButton(panel, ID_FORWARD_BUTTON, "Next", wx.wxPoint(190, 125), wx.wxSize(40, 30))
 
-local midLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 165), wx.wxSize(400, 1))
+-- Volume GUI
+volumeBar = wx.wxSlider(panel, ID_VOLUME_BAR, 0, 0, 100, wx.wxPoint(250, 130), wx.wxSize(105, 30))
+muteButton = wx.wxButton(panel, ID_VOLUME_BUTTON, "M", wx.wxPoint(355, 125), wx.wxSize(30, 30))
 
-local playlist = {}
+midLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 165), wx.wxSize(400, 1))
 
-local listBox = wx.wxListBox(panel, wx.wxID_ANY, wx.wxPoint(10, 175), wx.wxSize(375, 235), playlist, wx.wxLB_SINGLE)
+-- Playlist GUI
+listBox = wx.wxListBox(panel, wx.wxID_ANY, wx.wxPoint(10, 175), wx.wxSize(375, 235), playlist, wx.wxLB_SINGLE)
 
-local bottomLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 419), wx.wxSize(400, 1))
+bottomLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 419), wx.wxSize(400, 1))
 
-local addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "ADD", wx.wxPoint(10, 430), wx.wxSize(40, 30))
-local removeFromPlaylistButton = wx.wxButton(panel, ID_REMOVE_FROM_PLAYLIST_BUTTON, "REM", wx.wxPoint(55, 430), wx.wxSize(40, 30))
-local playSelectedButton = wx.wxButton(panel, ID_PLAY_SELECTED_TRACK_BUTTON, "SELECT", wx.wxPoint(100, 430), wx.wxSize(60, 30))
+-- Playlist buttons GUI
+addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "ADD", wx.wxPoint(10, 430), wx.wxSize(40, 30))
+removeFromPlaylistButton = wx.wxButton(panel, ID_REMOVE_FROM_PLAYLIST_BUTTON, "REM", wx.wxPoint(55, 430), wx.wxSize(40, 30))
+playSelectedButton = wx.wxButton(panel, ID_PLAY_SELECTED_TRACK_BUTTON, "SELECT", wx.wxPoint(100, 430), wx.wxSize(60, 30))
 
-local upButton = wx.wxButton(panel, ID_UP_BUTTON, "↑", wx.wxPoint(320, 430), wx.wxSize(30, 30))
-local downButton = wx.wxButton(panel, ID_DOWN_BUTTON, "↓", wx.wxPoint(355, 430), wx.wxSize(30, 30))
+upButton = wx.wxButton(panel, ID_UP_BUTTON, "↑", wx.wxPoint(320, 430), wx.wxSize(30, 30))
+downButton = wx.wxButton(panel, ID_DOWN_BUTTON, "↓", wx.wxPoint(355, 430), wx.wxSize(30, 30))
 
-local media = wx.wxMediaCtrl(panel, ID_MEDIA)
+-- mp3 player
+media = wx.wxMediaCtrl(panel, ID_MEDIA)
+
+UpdateButtons()
 
 -- Add songs to the playlist
 frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
@@ -91,7 +127,7 @@ frame:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     listBox:Delete(selectedIndex)
   
-    table.remove(playlist, selectedIndex + 1);
+    table.remove(playlist, selectedIndex + 1)
     
   end
 )
@@ -112,8 +148,16 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         return
     end
     
-    isLoaded = true;
+    isLoaded = true
+    UpdateButtons()
   end
+)
+
+
+media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
+    function (event)
+        UpdateButtons()
+    end
 )
 
 -- Plays loaded song
@@ -131,7 +175,7 @@ frame:Connect(ID_PLAY_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
             return
         end
         
-        isLoaded = true;
+        isLoaded = true
     end
   
     local canPlay = media:Play()
