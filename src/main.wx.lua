@@ -69,7 +69,7 @@ panel = wx.wxPanel(frame, wx.wxID_ANY)
 time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00/00:00", wx.wxPoint(10, 10), wx.wxSize(70, 30))
 title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(80, 10), wx.wxSize(340, 30))
 duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, sliderMax, wx.wxPoint(0, 35), wx.wxSize(390, 30))
-
+    
 topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
 
 -- Buttons BUI
@@ -180,6 +180,7 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     isLoaded = true
     title:SetLabel(file)
     UpdateButtons()
+    media:SetVolume(volumeBar:GetValue() / sliderMax)
   end
 )
 
@@ -233,7 +234,7 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 )
 
 -- Change volume
-frame:Connect(ID_VOLUME_BAR, wx.wxEVT_SCROLL_THUMBRELEASE,
+frame:Connect(ID_VOLUME_BAR, wx.wxEVT_SCROLL_CHANGED,
     function (event)
         local pos = event:GetPosition()
         media:SetVolume(pos / sliderMax)
