@@ -8,6 +8,7 @@ prevVolume = -1
 repeatOn = false
 stopPressed = false
 currentSongIndex = -1
+autoPlay = false
 
 local IDCounter = nil
 local function NewID()
@@ -232,7 +233,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
         if isLoaded and repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then
             media:Play()
         -- Check if the song is over with none mode on
-        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then 
+        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed and not autoPlay then 
             -- Check if the next song is a song at next index and load that song
             if listBox:GetCount() > currentSongIndex + 1 then                 
                 isLoaded = false
@@ -248,7 +249,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 currentSongIndex = currentSongIndex + 1
                 title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
-                stopPressed = true
+                autoPlay = true
             -- Next song is a song with index 0, load it
             else
                 isLoaded = false
@@ -264,13 +265,13 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 currentSongIndex = 0
                 title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
-                stopPressed = true
+                autoPlay = true
             end
             listBox:SetSelection(currentSongIndex)
         -- Play songs from playlist
-        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and stopPressed then 
+        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed and autoPlay then 
             media:Play()
-            stopPressed = false
+            autoPlay = false
         end
     end
 )
