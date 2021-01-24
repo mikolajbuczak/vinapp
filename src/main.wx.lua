@@ -266,6 +266,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 stopPressed = true
             end
+            listBox:SetSelection(currentSongIndex)
         -- Play songs from playlist
         elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and stopPressed then 
             media:Play()
@@ -366,6 +367,12 @@ frame:Connect(ID_UP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     table.insert(playlist, selectedIndex, filepath)
     
+    if selectedIndex == currentSongIndex then 
+        currentSongIndex = currentSongIndex - 1
+    elseif selectedIndex  == currentSongIndex + 1 then
+        currentSongIndex = currentSongIndex +1 
+    end
+    
   end
 )
 
@@ -392,6 +399,11 @@ frame:Connect(ID_DOWN_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     table.insert(playlist, selectedIndex + 2, filepath)
     
+    if selectedIndex == currentSongIndex then 
+        currentSongIndex = currentSongIndex + 1
+    elseif selectedIndex == currentSongIndex -1 then
+        currentSongIndex = currentSongIndex - 1
+    end
   end
 )
 
