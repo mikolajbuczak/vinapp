@@ -7,6 +7,7 @@ sliderMax = 10000
 prevVolume = -1
 repeatOn = false
 stopPressed = false
+currentSongIndex = -1
 
 local IDCounter = nil
 local function NewID()
@@ -217,6 +218,7 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     end
     
     isLoaded = true
+    currentSongIndex = selectedIndex
     title:SetLabel(file)
     media:SetVolume(volumeBar:GetValue() / sliderMax)
     stopPressed = true
@@ -228,6 +230,42 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
         UpdateButtons()
         if isLoaded and repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then
             media:Play()
+        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then 
+            if listBox:GetCount() > currentSongIndex + 1 then 
+                isLoaded = false
+    
+                local file = listBox:GetString(currentSongIndex + 1)
+                
+                if not media:Load(playlist[currentSongIndex + 2]) then
+                    wx.wxMessageBox(string.format("Cannot load  %s.", file), "Error", wx.wxICON_ERROR + wx.wxOK)
+                    return
+                end
+                
+                isLoaded = true
+                currentSongIndex = selectedIndex
+                title:SetLabel(file)
+                media:SetVolume(volumeBar:GetValue() / sliderMax)
+                stopPressed = true
+            else
+                isLoaded = false
+    
+                local file = listBox:GetString(0)
+                
+                if not media:Load(playlist[1]) then
+                    wx.wxMessageBox(string.format("Cannot load  %s.", file), "Error", wx.wxICON_ERROR + wx.wxOK)
+                    return
+                end
+                
+                isLoaded = true
+                currentSongIndex = 0
+                title:SetLabel(file)
+                media:SetVolume(volumeBar:GetValue() / sliderMax)
+                stopPressed = true
+
+            end
+        elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and stopPressed then 
+            media:Play()
+            stopPressed = false
         end
     end
 )
