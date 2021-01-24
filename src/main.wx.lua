@@ -4,6 +4,7 @@ require("wx")
 playlist = {}
 isLoaded = false
 sliderMax = 10000
+prevVolume = -1
 
 ID_TIME_LABEL                   = 1
 ID_TITLE_LABEL                  = 2
@@ -53,8 +54,6 @@ function UpdateButtons()
     playButton:Enable(playEnabled)
     pauseButton:Enable(pauseEnable)
     stopButton:Enable(stopEnabled)
-    
-    volumeBar:SetValue(media:GetVolume()*sliderMax)
 end
 
 frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSize(400, 500), wx.wxDEFAULT_FRAME_STYLE - wx.wxRESIZE_BORDER - wx.wxMAXIMIZE_BOX)
@@ -205,11 +204,29 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   end
 )
 
+-- Change volume
 frame:Connect(ID_VOLUME_BAR, wx.wxEVT_SCROLL_THUMBRELEASE,
     function (event)
         local pos = event:GetPosition()
         media:SetVolume(pos / sliderMax)
+        
+        if prevVolume ~= -1 then prevVolume = -1 end
     end 
+)
+
+-- Mute
+frame:Connect(ID_VOLUME_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    if prevVolume == -1 then
+        prevVolume = volumeBar:GetValue()
+        media:SetVolume(0)
+        volumeBar:SetValue(0)
+    else
+        media:SetVolume(prevVolume / sliderMax)
+        volumeBar:SetValue(prevVolume)
+        prevVolume = -1
+    end
+  end
 )
 
 -- Move selected song up
@@ -262,6 +279,7 @@ frame:Connect(ID_DOWN_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   end
 )
 
+-- Close window
 frame:Connect(wx.wxEVT_CLOSE_WINDOW,
     function (event)
         frame:Destroy()
