@@ -108,6 +108,8 @@ media = wx.wxMediaCtrl(panel, ID_MEDIA)
 UpdateButtons()
 
 timer = wx.wxTimer(panel)
+
+-- Updates time label and position slider value
 panel:Connect(wx.wxEVT_TIMER,
     function (event)
         local len = 1
@@ -121,8 +123,6 @@ panel:Connect(wx.wxEVT_TIMER,
         str = string.format("%s", msToMMSS(pos))
         duration:SetValue(sliderMax * pos / len)
         time:SetLabel(str)
-        
-        print(str)
     end
 )
 
@@ -178,6 +178,7 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     end
     
     isLoaded = true
+    title:SetLabel(file)
     UpdateButtons()
   end
 )
