@@ -128,6 +128,7 @@ panel:Connect(wx.wxEVT_TIMER,
 
 timer:Start(300)
 
+-- Scrolling through duration bar
 panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_CHANGED,
     function(event)
         if not isLoaded then return end
@@ -137,9 +138,7 @@ panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_CHANGED,
         
         local ok = media:Seek(math.floor(len * pos / sliderMax))
         if ok == wx.wxInvalidOffset then
-            wx.wxMessageBox(string.format("Unable to seek in %s: Unsupported format?", fileName),
-                            "wxLua Media Demo",
-                            wx.wxICON_ERROR + wx.wxOK)
+            wx.wxMessageBox(string.format("Cannot to scroll"), "Error", wx.wxICON_ERROR + wx.wxOK)
         end
     end
 )
@@ -199,7 +198,6 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     media:SetVolume(volumeBar:GetValue() / sliderMax)
   end
 )
-
 
 media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
     function (event)
