@@ -234,7 +234,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
         -- Check if the song is over with none mode on
         elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then 
             -- Check if the next song is a song at next index and load that song
-            if listBox:GetCount() > currentSongIndex + 1 then 
+            if listBox:GetCount() > currentSongIndex + 1 then                 
                 isLoaded = false
     
                 local file = listBox:GetString(currentSongIndex + 1)
@@ -245,7 +245,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 end
                 
                 isLoaded = true
-                currentSongIndex = selectedIndex
+                currentSongIndex = currentSongIndex + 1
                 title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 stopPressed = true
