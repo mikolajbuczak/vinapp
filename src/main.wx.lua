@@ -66,8 +66,8 @@ frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSi
 panel = wx.wxPanel(frame, wx.wxID_ANY)
 
 -- Song info GUI
-time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00", wx.wxPoint(10, 10), wx.wxSize(30, 30))
-title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(50, 10), wx.wxSize(340, 30))
+time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00/00:00", wx.wxPoint(10, 10), wx.wxSize(70, 30))
+title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(80, 10), wx.wxSize(340, 30))
 duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, sliderMax, wx.wxPoint(0, 35), wx.wxSize(390, 30))
 
 topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
@@ -120,7 +120,7 @@ panel:Connect(wx.wxEVT_TIMER,
         
         len = media:Length()
         pos = media:Tell()
-        str = string.format("%s", msToMMSS(pos))
+        str = string.format("%s/%s", msToMMSS(pos), msToMMSS(len))
         duration:SetValue(sliderMax * pos / len)
         time:SetLabel(str)
     end
