@@ -23,7 +23,6 @@ ID_DURATION_BAR                 = NewID()
 ID_MODE_LABEL                   = NewID()
 ID_RANDOM_BUTTON                = NewID()
 ID_REPEAT_BUTTON                = NewID()
-ID_SELECT_FILE_BUTTON           = NewID()
 ID_BACKWARDS_BUTTON             = NewID()
 ID_PLAY_BUTTON                  = NewID()
 ID_PAUSE_BUTTON                 = NewID()
@@ -87,9 +86,8 @@ topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 
 mode = wx.wxStaticText(panel, ID_TIME_LABEL, "Mode: None", wx.wxPoint(10, 80), wx.wxSize(80, 30))
 
 -- Buttons BUI
-randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(210, 80), wx.wxSize(55, 30))
-repeatButton = wx.wxButton(panel, ID_REPEAT_BUTTON, "Repeat", wx.wxPoint(270, 80), wx.wxSize(55, 30))
-selectFileButton = wx.wxButton(panel, ID_SELECT_FILE_BUTTON, "Select", wx.wxPoint(330, 80), wx.wxSize(55, 30))
+randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(270, 80), wx.wxSize(55, 30))
+repeatButton = wx.wxButton(panel, ID_REPEAT_BUTTON, "Repeat", wx.wxPoint(330, 80), wx.wxSize(55, 30))
 
 backwardsButton = wx.wxButton(panel, ID_BACKWARDS_BUTTON, "<", wx.wxPoint(10, 125), wx.wxSize(30, 30))
 playButton = wx.wxButton(panel, ID_PLAY_BUTTON, "►", wx.wxPoint(45, 125), wx.wxSize(30, 30))
