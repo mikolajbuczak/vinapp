@@ -276,6 +276,26 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
     end
 )
 
+frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+    function(event)
+        if not isLoaded then return end
+        if media:Tell() < 1000 then
+            if currentSongIndex == 0 then
+                currentSongIndex = listBox:GetCount() - 2
+            elseif currentSongIndex == 1 then
+                currentSongIndex = listBox:GetCount() -1
+            else
+                currentSongIndex = currentSongIndex - 2
+            end
+            local canStop = media:Stop()
+            if not canStop then return end
+        else
+            media:Seek(0)
+        end
+    end
+)
+ 
+
 -- Plays loaded song
 frame:Connect(ID_PLAY_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
@@ -319,6 +339,13 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     if not canStop then return end
     
     stopPressed = true
+  end
+)
+frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+  function(event)
+    local canStop = media:Stop()
+    
+    if not canStop then return end
   end
 )
 
