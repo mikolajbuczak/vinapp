@@ -247,10 +247,22 @@ frame:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     local selectedIndex = listBox:GetSelection()
     
     if selectedIndex == -1 then return end
-    
     listBox:Delete(selectedIndex)
-  
+    if not (listBox:GetCount() > 0) then
+        table.remove(playlist, selectedIndex + 1)
+        return
+    end
+    if selectedIndex >= listBox:GetCount() then
+        listBox:SetSelection(selectedIndex - 1)
+    elseif listBox:GetCount() > 0 then
+        listBox:SetSelection(selectedIndex - 1)
+    end
+    
+    if selectedIndex <= currentSongIndex then  
+        currentSongIndex = currentSongIndex - 1
+    end
     table.remove(playlist, selectedIndex + 1)
+    
     
   end
 )
