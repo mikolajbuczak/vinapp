@@ -10,6 +10,8 @@ randomOn = false
 stopPressed = false
 currentSongIndex = -1
 autoPlay = false
+settingSliderPosition = false
+thumbRelease = false
 
 local IDCounter = nil
 local function NewID()
@@ -134,7 +136,9 @@ panel:Connect(wx.wxEVT_TIMER,
         len = media:Length()
         pos = media:Tell()
         str = string.format("%s/%s", msToMMSS(pos), msToMMSS(len))
-        duration:SetValue(sliderMax * pos / len)
+        if not settingSliderPosition then
+            duration:SetValue(sliderMax * pos / len)
+        end
         time:SetLabel(str)
     end
 )
@@ -142,10 +146,34 @@ panel:Connect(wx.wxEVT_TIMER,
 timer:Start(300)
 
 -- Scrolling through duration bar
+panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_THUMBTRACK,
+    function(event)
+        if not isLoaded then return end
+        settingSliderPosition = true 
+        local pos = event:GetPosition()
+        local len = media:Length()
+        
+        local ok = media:Seek(math.floor(len * pos / sliderMax))
+        if ok == wx.wxInvalidOffset then
+            wx.wxMessageBox(string.format("Cannot to scroll"), "Error", wx.wxICON_ERROR + wx.wxOK)
+        end
+    end
+)
+
+panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_THUMBRELEASE,
+    function(event)
+        if not isLoaded then return end
+        settingSliderPosition = false
+        thumbRelease = true
+    end
+)
 panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_CHANGED,
     function(event)
         if not isLoaded then return end
-        
+        if thumbRelease then
+            thumbRelease = false
+            return
+        end
         local pos = event:GetPosition()
         local len = media:Length()
         
