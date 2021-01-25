@@ -337,16 +337,16 @@ frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         if not isLoaded then return end
         if media:Tell() < 2000 and not randomOn then
         local indexDelta = 2
-            if media:GetState() == wx.wxMEDIASTATE_STOPPED then indexDelta = 1 end
+            if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then indexDelta = 1 end
             if currentSongIndex == 0 then
                 currentSongIndex = listBox:GetCount() - indexDelta
-            elseif currentSongIndex == 1 then
+            elseif currentSongIndex == 1 and indexDelta == 2 then
                 currentSongIndex = listBox:GetCount() + 1 - indexDelta 
             else
                 currentSongIndex = currentSongIndex - indexDelta 
             end
             local file = listBox:GetString(currentSongIndex)
-            if media:GetState() == wx.wxMEDIASTATE_STOPPED then listBox:SetSelection(currentSongIndex) end
+            if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
             media:Load(playlist[currentSongIndex + 1])
             title:SetLabel(file)
             UpdateButtons()
@@ -415,7 +415,7 @@ frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         media:Load(playlist[currentSongIndex + 1])
         title:SetLabel(file)
         UpdateButtons()
-    elseif media:GetState() == wx.wxMEDIASTATE_STOPPED then 
+    elseif media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then 
         currentSongIndex = currentSongIndex + 1
         if currentSongIndex >= listBox:GetCount() then currentSongIndex = 0 end
         local file = listBox:GetString(currentSongIndex)
@@ -425,7 +425,7 @@ frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         UpdateButtons()
     else
         local canStop = media:Stop()
-        
+    
         if not canStop then return end
     end
   end
