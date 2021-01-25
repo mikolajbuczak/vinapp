@@ -282,6 +282,10 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 
 media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
     function (event)
+        if not (listBox:GetCount() > 0) then
+            UpdateButtons()
+            return 
+        end
         UpdateButtons()
         -- Replay song if repeat mode on
         if isLoaded and repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed then
