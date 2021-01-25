@@ -277,16 +277,21 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
 frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     function(event)
         if not isLoaded then return end
-        if media:Tell() < 1000 then
+        if media:Tell() < 2000 then
+        local indexDelta = 2
+            if media:GetState() == wx.wxMEDIASTATE_STOPPED then indexDelta = 1 end
             if currentSongIndex == 0 then
-                currentSongIndex = listBox:GetCount() - 2
+                currentSongIndex = listBox:GetCount() - indexDelta
             elseif currentSongIndex == 1 then
-                currentSongIndex = listBox:GetCount() -1
+                currentSongIndex = listBox:GetCount() + 1 - indexDelta 
             else
-                currentSongIndex = currentSongIndex - 2
+                currentSongIndex = currentSongIndex - indexDelta 
             end
-            local canStop = media:Stop()
-            if not canStop then return end
+            local file = listBox:GetString(currentSongIndex)
+            if media:GetState() == wx.wxMEDIASTATE_STOPPED then listBox:SetSelection(currentSongIndex) end
+            media:Load(playlist[currentSongIndex + 1])
+            title:SetLabel(file)
+            UpdateButtons()
         else
             media:Seek(0)
         end
@@ -340,10 +345,20 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   end
 )
 frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
-  function(event)
-    local canStop = media:Stop()
+    function(event)
+    if media:GetState() == wx.wxMEDIASTATE_STOPPED then 
+        currentSongIndex = currentSongIndex + 1
+        if currentSongIndex >= listBox:GetCount() then currentSongIndex = 0 end
+        local file = listBox:GetString(currentSongIndex)
+        listBox:SetSelection(currentSongIndex)
+        media:Load(playlist[currentSongIndex + 1])
+        title:SetLabel(file)
+        UpdateButtons()
+    else
+        local canStop = media:Stop()
     
-    if not canStop then return end
+        if not canStop then return end
+    end
   end
 )
 
