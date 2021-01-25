@@ -88,7 +88,7 @@ frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSi
 panel = wx.wxPanel(frame, wx.wxID_ANY)
 
 --Adding window icon
-icon=wx.wxIcon("D:/ProjektLua/resources/logo3.ico",wx.wxBITMAP_TYPE_ICO)
+icon=wx.wxIcon("D:/GitHub/vinapp/resources/logo3.ico", wx.wxBITMAP_TYPE_ICO)
 frame:SetIcon(icon)
 
 -- Song info GUI
@@ -239,7 +239,14 @@ frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         
         local songs = filePicker:GetFilenames()
         
-        listBox:InsertItems(songs, listBox:GetCount())
+        local songsNoExtension = {}
+        
+        for index, song in pairs(songs) do
+            local title = song:match("(.+)%..+$")
+            table.insert(songsNoExtension, title)
+        end
+        
+        listBox:InsertItems(songsNoExtension, listBox:GetCount())
     end
     filePicker:Destroy()
   end
@@ -289,8 +296,7 @@ frame:Connect(ID_PLAY_SELECTED_TRACK_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     
     isLoaded = true
     currentSongIndex = selectedIndex
-    titleSong = file:match("(.+)%..+$")
-    title:SetLabel(titleSong)
+    title:SetLabel(file)
     media:SetVolume(volumeBar:GetValue() / sliderMax)
     stopPressed = true
   end
@@ -317,8 +323,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 currentSongIndex = randomIndex
                 local file = listBox:GetString(currentSongIndex)
                 media:Load(playlist[currentSongIndex + 1])
-                titleSong = file:match("(.+)%..+$")
-                title:SetLabel(titleSong)
+                title:SetLabel(file)
                 UpdateButtons()
                 autoPlay = true
             elseif listBox:GetCount() > currentSongIndex + 1 then                 
@@ -333,8 +338,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 
                 isLoaded = true
                 currentSongIndex = currentSongIndex + 1
-                titleSong = file:match("(.+)%..+$")
-                title:SetLabel(titleSong)
+                title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 autoPlay = true
             -- Next song is a song with index 0, load it
@@ -350,8 +354,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
                 
                 isLoaded = true
                 currentSongIndex = 0
-                titleSong = file:match("(.+)%..+$")
-                title:SetLabel(titleSong)
+                title:SetLabel(file)
                 media:SetVolume(volumeBar:GetValue() / sliderMax)
                 autoPlay = true
             end
@@ -380,8 +383,7 @@ frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
             local file = listBox:GetString(currentSongIndex)
             if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
             media:Load(playlist[currentSongIndex + 1])
-            titleSong = file:match("(.+)%..+$")
-            title:SetLabel(titleSong)
+            title:SetLabel(file)
             UpdateButtons()
         else
             media:Seek(0)
@@ -446,8 +448,7 @@ frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         local file = listBox:GetString(currentSongIndex)
         if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
         media:Load(playlist[currentSongIndex + 1])
-        titleSong = file:match("(.+)%..+$")
-        title:SetLabel(titleSong)
+        title:SetLabel(file)
         UpdateButtons()
     elseif media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then 
         currentSongIndex = currentSongIndex + 1
@@ -455,8 +456,7 @@ frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         local file = listBox:GetString(currentSongIndex)
         listBox:SetSelection(currentSongIndex)
         media:Load(playlist[currentSongIndex + 1])
-        titleSong = file:match("(.+)%..+$")
-        title:SetLabel(titleSong)
+        title:SetLabel(file)
         UpdateButtons()
     else
         local canStop = media:Stop()
