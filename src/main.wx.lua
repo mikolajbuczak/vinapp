@@ -6,6 +6,7 @@ isLoaded = false
 sliderMax = 10000
 prevVolume = -1
 repeatOn = false
+randomOn = false
 stopPressed = false
 currentSongIndex = -1
 autoPlay = false
@@ -159,12 +160,30 @@ panel:Connect(ID_DURATION_BAR, wx.wxEVT_SCROLL_CHANGED,
 frame:Connect(ID_REPEAT_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
     repeatOn = not repeatOn
-    if repeatOn then
+    if repeatOn and randomOn then
+        mode:SetLabel("Mode: Random / Repeat")
+    elseif repeatOn and not randomOn then
         mode:SetLabel("Mode: Repeat")
+    elseif not repeatOn and randomOn then
+        mode:SetLabel("Mode: Random")
     else
         mode:SetLabel("Mode: None")
     end
   end
+)
+frame:Connect(ID_RANDOM_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
+    function(event)
+        randomOn = not randomOn
+        if repeatOn and randomOn then
+            mode:SetLabel("Mode: Random / Repeat")
+        elseif repeatOn and not randomOn then
+            mode:SetLabel("Mode: Repeat")
+        elseif not repeatOn and randomOn then
+            mode:SetLabel("Mode: Random")
+        else
+            mode:SetLabel("Mode: None")
+        end
+    end
 )
 
 -- Add songs to the playlist
@@ -233,9 +252,20 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
         -- Check if the song is over with none mode on
         elseif isLoaded and not repeatOn and media:GetState() == wx.wxMEDIASTATE_STOPPED and not stopPressed and not autoPlay then 
             -- Check if the next song is a song at next index and load that song
-            if listBox:GetCount() > currentSongIndex + 1 then                 
+            if randomOn then
+                randomIndex = math.random(0, listBox:GetCount()-1)
+                while currentSongIndex == randomIndex do
+                    randomIndex = math.random(0, listBox:GetCount()-1)
+                end
+                currentSongIndex = randomIndex
+                local file = listBox:GetString(currentSongIndex)
+                media:Load(playlist[currentSongIndex + 1])
+                title:SetLabel(file)
+                UpdateButtons()
+                autoPlay = true
+            elseif listBox:GetCount() > currentSongIndex + 1 then                 
                 isLoaded = false
-    
+                
                 local file = listBox:GetString(currentSongIndex + 1)
                 
                 if not media:Load(playlist[currentSongIndex + 2]) then
@@ -277,7 +307,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
 frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     function(event)
         if not isLoaded then return end
-        if media:Tell() < 2000 then
+        if media:Tell() < 2000 and not randomOn then
         local indexDelta = 2
             if media:GetState() == wx.wxMEDIASTATE_STOPPED then indexDelta = 1 end
             if currentSongIndex == 0 then
@@ -346,7 +376,18 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 )
 frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     function(event)
-    if media:GetState() == wx.wxMEDIASTATE_STOPPED then 
+    if randomOn then
+        randomIndex = math.random(0, listBox:GetCount()-1)
+        while currentSongIndex == randomIndex do
+            randomIndex = math.random(0, listBox:GetCount()-1)
+        end
+        currentSongIndex = randomIndex
+        local file = listBox:GetString(currentSongIndex)
+        if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
+        media:Load(playlist[currentSongIndex + 1])
+        title:SetLabel(file)
+        UpdateButtons()
+    elseif media:GetState() == wx.wxMEDIASTATE_STOPPED then 
         currentSongIndex = currentSongIndex + 1
         if currentSongIndex >= listBox:GetCount() then currentSongIndex = 0 end
         local file = listBox:GetString(currentSongIndex)
@@ -356,7 +397,7 @@ frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         UpdateButtons()
     else
         local canStop = media:Stop()
-    
+        
         if not canStop then return end
     end
   end
