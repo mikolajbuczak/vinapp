@@ -87,6 +87,10 @@ end
 frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSize(400, 500), wx.wxDEFAULT_FRAME_STYLE - wx.wxRESIZE_BORDER - wx.wxMAXIMIZE_BOX)
 panel = wx.wxPanel(frame, wx.wxID_ANY)
 
+--Adding window icon
+icon=wx.wxIcon("D:/ProjektLua/resources/logo3.ico",wx.wxBITMAP_TYPE_ICO)
+frame:SetIcon(icon)
+
 -- Song info GUI
 time = wx.wxStaticText(panel, ID_TIME_LABEL, "00:00/00:00", wx.wxPoint(10, 10), wx.wxSize(70, 30))
 title = wx.wxStaticText(panel, ID_TIME_LABEL, "Title", wx.wxPoint(80, 10), wx.wxSize(340, 30))
