@@ -252,6 +252,7 @@ frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
         listBox:InsertItems(songsNoExtension, listBox:GetCount())
     end
     filePicker:Destroy()
+    UpdateButtons()
   end
 )
 
@@ -277,7 +278,7 @@ frame:Connect(ID_REMOVE_FROM_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     end
     table.remove(playlist, selectedIndex + 1)
     
-    
+    UpdateButtons()
   end
 )
 
