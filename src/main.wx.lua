@@ -232,7 +232,7 @@ frame:Connect(ID_RANDOM_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 -- Add songs to the playlist
 frame:Connect(ID_ADD_TO_PLAYLIST_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
   function(event)
-    local filePicker = wx.wxFileDialog(frame, wx.wxFileSelectorPromptStr, wx.wxGetCwd(), "", "*.mp3", wx.wxFD_OPEN + wx.wxFD_MULTIPLE + wx.wxFD_FILE_MUST_EXIST + wx.wxFD_CHANGE_DIR)
+    local filePicker = wx.wxFileDialog(frame, wx.wxFileSelectorPromptStr, wx.wxGetCwd(), "", "MP3 Music Files (*.mp3)|*.mp3|WAV Files (*.wav)|*.wav|OGG Files (*.ogg)|*.ogg", wx.wxFD_OPEN + wx.wxFD_MULTIPLE + wx.wxFD_FILE_MUST_EXIST + wx.wxFD_CHANGE_DIR)
     if filePicker:ShowModal() == wx.wxID_OK then
         local paths = filePicker:GetPaths()
         
