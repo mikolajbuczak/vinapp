@@ -320,7 +320,7 @@ media:Connect(wx.wxEVT_MEDIA_STATECHANGED,
             -- Check if the next song is a song at next index and load that song
             if randomOn then
                 randomIndex = math.random(0, listBox:GetCount()-1)
-                while currentSongIndex == randomIndex do
+                while currentSongIndex == randomIndex and listBox:GetCount()> 1 do
                     randomIndex = math.random(0, listBox:GetCount()-1)
                 end
                 currentSongIndex = randomIndex
