@@ -24,6 +24,7 @@ ID_TIME_LABEL                   = NewID()
 ID_TITLE_LABEL                  = NewID()
 ID_DURATION_BAR                 = NewID()
 ID_MODE_LABEL                   = NewID()
+ID_LOGO                         = NewID()
 ID_RANDOM_BUTTON                = NewID()
 ID_REPEAT_BUTTON                = NewID()
 ID_BACKWARDS_BUTTON             = NewID()
@@ -88,7 +89,7 @@ frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, "VinApp", wx.wxDefaultPosition, wx.wxSi
 panel = wx.wxPanel(frame, wx.wxID_ANY)
 
 --Adding window icon
-icon=wx.wxIcon("D:/GitHub/vinapp/resources/logo3.ico", wx.wxBITMAP_TYPE_ICO)
+icon=wx.wxIcon("D:/GitHub/vinapp/resources/icon.ico", wx.wxBITMAP_TYPE_ICO)
 frame:SetIcon(icon)
 
 -- Song info GUI
@@ -98,8 +99,8 @@ duration = wx.wxSlider(panel, ID_DURATION_BAR, 0, 0, sliderMax, wx.wxPoint(0, 35
     
 topLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 69), wx.wxSize(400, 1))
 
-mode = wx.wxStaticText(panel, ID_TIME_LABEL, "Mode: None", wx.wxPoint(10, 80), wx.wxSize(80, 30))
-
+bitmap = wx.wxBitmap("D:/GitHub/vinapp/resources/logo.png", wx.wxBITMAP_TYPE_PNG)
+logo = wx.wxStaticBitmap(panel, ID_LOGO, bitmap, wx.wxPoint(10, 82), wx.wxSize(116, 38))
 -- Buttons BUI
 randomButton = wx.wxButton(panel, ID_RANDOM_BUTTON, "Random", wx.wxPoint(270, 80), wx.wxSize(55, 30))
 repeatButton = wx.wxButton(panel, ID_REPEAT_BUTTON, "Repeat", wx.wxPoint(330, 80), wx.wxSize(55, 30))
@@ -125,6 +126,8 @@ bottomLine = wx.wxStaticLine(panel, wx.wxID_ANY, wx.wxPoint(0, 419), wx.wxSize(4
 addToPlaylistButton = wx.wxButton(panel, ID_ADD_TO_PLAYLIST_BUTTON, "+", wx.wxPoint(10, 430), wx.wxSize(30, 30))
 removeFromPlaylistButton = wx.wxButton(panel, ID_REMOVE_FROM_PLAYLIST_BUTTON, "-", wx.wxPoint(45, 430), wx.wxSize(30, 30))
 playSelectedButton = wx.wxButton(panel, ID_PLAY_SELECTED_TRACK_BUTTON, "LOAD", wx.wxPoint(80, 430), wx.wxSize(50, 30))
+
+mode = wx.wxStaticText(panel, ID_TIME_LABEL, "Mode: None", wx.wxPoint(140, 438), wx.wxSize(80, 30))
 
 upButton = wx.wxButton(panel, ID_UP_BUTTON, "▲", wx.wxPoint(320, 430), wx.wxSize(30, 30))
 downButton = wx.wxButton(panel, ID_DOWN_BUTTON, "▼", wx.wxPoint(355, 430), wx.wxSize(30, 30))
