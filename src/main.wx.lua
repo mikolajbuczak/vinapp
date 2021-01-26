@@ -384,9 +384,11 @@ frame:Connect(ID_BACKWARDS_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
                 currentSongIndex = currentSongIndex - indexDelta 
             end
             local file = listBox:GetString(currentSongIndex)
-            if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
+            if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then
+                listBox:SetSelection(currentSongIndex)
+                title:SetLabel(file)
+            end
             media:Load(playlist[currentSongIndex + 1])
-            title:SetLabel(file)
             UpdateButtons()
         else
             media:Seek(0)
@@ -442,18 +444,18 @@ frame:Connect(ID_STOP_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
 )
 frame:Connect(ID_FORWARD_BUTTON, wx.wxEVT_COMMAND_BUTTON_CLICKED,
     function(event)
-    if randomOn then
+    if randomOn and media:GetState() == wx.wxMEDIASTATE_STOPPED then
         randomIndex = math.random(0, listBox:GetCount()-1)
         while currentSongIndex == randomIndex do
             randomIndex = math.random(0, listBox:GetCount()-1)
         end
         currentSongIndex = randomIndex
         local file = listBox:GetString(currentSongIndex)
-        if media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then listBox:SetSelection(currentSongIndex) end
         media:Load(playlist[currentSongIndex + 1])
+        listBox:SetSelection(currentSongIndex)
         title:SetLabel(file)
         UpdateButtons()
-    elseif media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn then 
+    elseif media:GetState() == wx.wxMEDIASTATE_STOPPED or repeatOn and not randomOn then 
         currentSongIndex = currentSongIndex + 1
         if currentSongIndex >= listBox:GetCount() then currentSongIndex = 0 end
         local file = listBox:GetString(currentSongIndex)
